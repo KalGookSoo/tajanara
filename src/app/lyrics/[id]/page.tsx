@@ -26,6 +26,7 @@ export default function LyricsPracticePage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [totalErrors, setTotalErrors] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
+  const [accuracy, setAccuracy] = useState('0');
 
   // 컴포넌트가 마운트될 때 입력 필드에 포커스 및 타이머 시작
   useEffect(() => {
@@ -47,67 +48,68 @@ export default function LyricsPracticePage() {
     };
   }, []);
 
+  // 폼 제출 처리 함수
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  // 키보드 이벤트 처리 (Enter로 다음 줄로 이동)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
+    // 입력이 비어있으면 처리하지 않음 (WPM 버그 수정)
+    if (!song.lyrics[currentLineIndex] || !song.lyrics[currentLineIndex].length) {
+      return;
+    }
 
-        // 입력이 비어있으면 처리하지 않음 (WPM 버그 수정)
-        if (userInput.length === 0) {
-          return;
-        }
+    // 현재 라인이 유효한지 확인
+    if (currentLineIndex >= song.lyrics.length) {
+      return;
+    }
 
-        // 현재 줄과 입력 비교하여 오류 계산
-        const currentLine = song.lyrics[currentLineIndex];
-        let lineErrors = 0;
+    // 현재 줄과 입력 비교하여 오류 계산
+    const currentLine = song.lyrics[currentLineIndex];
 
-        // 입력된 각 문자에 대해 오류 확인
-        for (let i = 0; i < userInput.length; i++) {
-          if (i >= currentLine.length || userInput[i] !== currentLine[i]) {
-            lineErrors++;
-          }
-        }
+    // 입력된 각 문자에 대해 오류 확인
+    const inputErrors = userInput
+      .split('')
+      .filter((char, i) => i >= currentLine.length || char !== currentLine[i]).length;
 
-        // 누락된 문자도 오류로 계산
-        if (userInput.length < currentLine.length) {
-          lineErrors += currentLine.length - userInput.length;
-        }
+    // 누락된 문자도 오류로 계산
+    const missingErrors = userInput.length < currentLine.length ? currentLine.length - userInput.length : 0;
 
-        // 총 오류 및 문자 수 업데이트
-        setTotalErrors(prev => prev + lineErrors);
-        setTotalChars(prev => prev + currentLine.length);
+    const lineErrors = inputErrors + missingErrors;
 
-        // 마지막 줄인지 확인
-        const isLastLine = currentLineIndex === song.lyrics.length - 1;
+    // 총 오류 및 문자 수 업데이트
+    setTotalErrors((prev) => prev + lineErrors);
+    setTotalChars((prev) => prev + currentLine.length);
 
-        if (isLastLine) {
-          // 마지막 줄이면 결과 페이지로 이동
-          const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
-          // 타이머 정지
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-          }
-          // 결과 페이지로 이동
-          const url = new URL('/result', window.location.href);
-          url.searchParams.set('time', elapsedTime.toString());
-          url.searchParams.set('wpm', wpm.toString());
-          url.searchParams.set('accuracy', accuracy.toFixed(1));
-          url.searchParams.set('artist', song.artist);
-          url.searchParams.set('title', song.title);
-          router.push(url.href);
-        } else {
-          // 다음 줄로 이동
-          setCurrentLineIndex(prev => prev + 1);
-          setUserInput('');
-        }
-      }
-    };
+    // 정확도 계산 및 업데이트 (폼 제출 시 일괄 계산)
+    const newTotalErrors = totalErrors + lineErrors;
+    const newTotalChars = totalChars + currentLine.length;
+    if (newTotalChars > 0) {
+      const newAccuracy = Math.max(0, Math.min(100, Math.round((1 - newTotalErrors / newTotalChars) * 1000) / 10));
+      setAccuracy(newAccuracy.toFixed(1));
+    }
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [userInput, song.lyrics, currentLineIndex, totalErrors, totalChars, elapsedTime, wpm, router, song]);
+    // 마지막 줄인지 확인
+    const isLastLine = currentLineIndex === song.lyrics.length - 1;
+    if (!isLastLine) {
+      // 다음 줄로 이동
+      setCurrentLineIndex((prev) => prev + 1);
+      setUserInput('');
+      return;
+    }
+
+    // 타이머 정지
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // 결과 페이지로 이동
+    const url = new URL('/result', window.location.href);
+    url.searchParams.set('time', elapsedTime.toString());
+    url.searchParams.set('wpm', wpm.toString());
+    url.searchParams.set('accuracy', accuracy);
+    url.searchParams.set('artist', song.artist);
+    url.searchParams.set('title', song.title);
+    router.push(url.href);
+  };
 
   // 입력 변경 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,14 +172,6 @@ export default function LyricsPracticePage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // 정확도 계산
-  const calculateAccuracy = (): string => {
-    if (totalChars === 0) return '100.0';
-    const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
-    return accuracy.toFixed(1);
-  };
-
-
   return (
     <div className="flex flex-col items-center justify-between min-h-[calc(100vh-200px)]">
       <div className="w-full max-w-2xl">
@@ -196,7 +190,7 @@ export default function LyricsPracticePage() {
             </div>
             <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg">
               <span className="text-sm text-gray-500">정확도:</span>
-              <span className="ml-2 font-medium">{calculateAccuracy()}%</span>
+              <span className="ml-2 font-medium">{accuracy}%</span>
             </div>
           </div>
         </div>
@@ -236,16 +230,20 @@ export default function LyricsPracticePage() {
           <p className="mb-2 text-sm text-gray-500">현재 줄:</p>
           <p className="mb-4 font-medium">{song.lyrics[currentLineIndex]}</p>
 
-          <input
-            ref={inputRef}
-            type="text"
-            value={userInput}
-            onChange={handleInputChange}
-            className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-              isCorrect ? 'focus:ring-green-500 border-green-300' : 'focus:ring-red-500 border-red-300'
-            }`}
-            placeholder="여기에 타이핑하세요."
-          />
+          <form onSubmit={handleSubmit}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                isCorrect ? 'focus:ring-green-500 border-green-300' : 'focus:ring-red-500 border-red-300'
+              }`}
+              placeholder="여기에 타이핑하세요."
+              required
+            />
+            <button type="submit" className="sr-only">제출</button>
+          </form>
 
           <p className="mt-2 text-sm text-gray-500">
             {isCorrect ? '올바르게 입력하고 있습니다.' : '입력이 일치하지 않습니다. 다시 시도하세요.'}
