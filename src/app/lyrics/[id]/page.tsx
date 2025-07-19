@@ -141,6 +141,15 @@ export default function LyricsPracticePage() {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    inputRef.current?.setCustomValidity('부정행위가 감지되었습니다.');
+    inputRef.current?.reportValidity();
+    setTimeout(() => {
+      inputRef.current?.setCustomValidity('');
+    }, 3000);
+  };
+
   // 슬라이딩 디스플레이에 표시할 줄 가져오기 (현재 줄과 그 전후 몇 줄)
   const getVisibleLines = () => {
     const visibleLines = [];
@@ -237,6 +246,7 @@ export default function LyricsPracticePage() {
               type="text"
               value={userInput}
               onChange={handleInputChange}
+              onPaste={handlePaste}
               className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
                 isCorrect ? 'focus:ring-green-500 border-green-300' : 'focus:ring-red-500 border-red-300'
               }`}
