@@ -1,6 +1,6 @@
 # 타자나라
 
-[링크](https://tajanara-d3olv3xox-kalgooksoos-projects.vercel.app/)
+[링크](https://tajanara.vercel.app/)
 ![Preview](docs/preview.png)
 
 ## 소개 (Introduction)
