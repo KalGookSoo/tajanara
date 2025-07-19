@@ -1,12 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
-
-// 노래 목록 샘플 - 현재는 대한민국 애국가만 포함
-const songItems = [
-  { name: '대한민국 애국가', id: 'national-anthem' }
-];
+import { useEffect, useRef, useState } from 'react';
+import { songItems } from '../shared/songs';
 
 export default function LyricsPage() {
   const router = useRouter();
@@ -19,11 +15,11 @@ export default function LyricsPage() {
       switch (e.key) {
         case 'ArrowUp':
           e.preventDefault();
-          setActiveIndex(prev => (prev > 0 ? prev - 1 : songItems.length - 1));
+          setActiveIndex((prev) => (prev > 0 ? prev - 1 : songItems.length - 1));
           break;
         case 'ArrowDown':
           e.preventDefault();
-          setActiveIndex(prev => (prev < songItems.length - 1 ? prev + 1 : 0));
+          setActiveIndex((prev) => (prev < songItems.length - 1 ? prev + 1 : 0));
           break;
         case 'Enter':
           e.preventDefault();
@@ -53,7 +49,7 @@ export default function LyricsPage() {
         {songItems.map((item, index) => (
           <div
             key={index}
-            ref={el => songRefs.current[index] = el}
+            ref={(el) => (songRefs.current[index] = el)}
             className={`bg-gray-800 hover:bg-gray-900 text-white text-xl font-bold p-8 rounded-lg shadow-md transition-all transform hover:scale-105 focus:ring-4 focus:ring-gray-500 focus:outline-none cursor-pointer ${
               activeIndex === index ? 'ring-4 ring-gray-500 scale-105' : ''
             }`}
@@ -67,7 +63,7 @@ export default function LyricsPage() {
               }
             }}
           >
-            {item.name}
+            {item.title} - {item.artist}
           </div>
         ))}
       </div>

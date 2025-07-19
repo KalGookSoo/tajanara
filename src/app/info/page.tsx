@@ -1,11 +1,11 @@
 'use client';
 
-import { 
-  InformationCircleIcon, 
-  BuildingOfficeIcon, 
-  UserIcon, 
-  EnvelopeIcon, 
-  DocumentTextIcon 
+import {
+  BuildingOfficeIcon,
+  DocumentTextIcon,
+  EnvelopeIcon,
+  InformationCircleIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 
 export default function InfoPage() {
@@ -42,7 +42,7 @@ export default function InfoPage() {
           <EnvelopeIcon className="w-6 h-6" />
           <div>
             <h2 className="font-semibold">이메일</h2>
-            <p>foo@gmail.com</p>
+            <p>ga.miro3721@gmail.com</p>
           </div>
         </div>
 

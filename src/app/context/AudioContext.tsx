@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface AudioContextType {
   isMuted: boolean;
@@ -35,17 +35,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!isMuted && audioRef.current) {
       // 오디오를 처음으로 되돌리고 재생
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(error => {
+      audioRef.current.play().catch((error) => {
         console.error('오디오 재생 오류:', error);
       });
     }
   };
 
-  return (
-    <AudioContext.Provider value={{ isMuted, toggleMute, playKeyboardSound }}>
-      {children}
-    </AudioContext.Provider>
-  );
+  return <AudioContext.Provider value={{ isMuted, toggleMute, playKeyboardSound }}>{children}</AudioContext.Provider>;
 }
 
 export function useAudio() {

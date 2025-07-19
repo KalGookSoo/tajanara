@@ -10,12 +10,12 @@ export default function KeyboardSoundEffect() {
     const handleKeyDown = (e: KeyboardEvent) => {
       // 수정자 키를 제외한 키 누름 시 소리 재생
       if (
-        !e.ctrlKey && 
-        !e.altKey && 
-        !e.metaKey && 
-        e.key !== 'Shift' && 
-        e.key !== 'Control' && 
-        e.key !== 'Alt' && 
+        !e.ctrlKey &&
+        !e.altKey &&
+        !e.metaKey &&
+        e.key !== 'Shift' &&
+        e.key !== 'Control' &&
+        e.key !== 'Alt' &&
         e.key !== 'Meta'
       ) {
         playKeyboardSound();
