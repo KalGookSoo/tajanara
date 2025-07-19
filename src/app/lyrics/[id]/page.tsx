@@ -5,23 +5,26 @@ import { songItems } from '../../shared/songs';
 import { useParams } from 'next/navigation';
 
 export default function LyricsPracticePage() {
-  // useParams를 사용하여 라우트 매개변수 가져오기
   const params = useParams();
-  // ID를 숫자로 변환하고 해당 노래 찾기
+
+  // 현재 음악 탐색
   const songId = parseInt(params.id as string, 10);
   const song = songItems.find((item) => item.id === songId) || songItems[0];
 
+  // 현재 입력 상태
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [isCorrect, setIsCorrect] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 타이핑 속도 측정을 위한 상태
+  // 현재 스코어 상태
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [typedChars, setTypedChars] = useState(0);
   const [wpm, setWpm] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [totalErrors, setTotalErrors] = useState(0);
+  const [totalChars, setTotalChars] = useState(0);
 
   // 컴포넌트가 마운트될 때 입력 필드에 포커스 및 타이머 시작
   useEffect(() => {
@@ -46,21 +49,57 @@ export default function LyricsPracticePage() {
   // 키보드 이벤트 처리 (Enter로 다음 줄로 이동)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && userInput.length > 0) {
+      if (e.key === 'Enter') {
         e.preventDefault();
-        // 다음 줄로 이동
-        setCurrentLineIndex((prev) => (prev < song.lyrics.length - 1 ? prev + 1 : prev));
-        setUserInput('');
+
+        // 입력이 비어있으면 처리하지 않음 (WPM 버그 수정)
+        if (userInput.length === 0) {
+          return;
+        }
+
+        // 현재 줄과 입력 비교하여 오류 계산
+        const currentLine = song.lyrics[currentLineIndex];
+        let lineErrors = 0;
+
+        // 입력된 각 문자에 대해 오류 확인
+        for (let i = 0; i < userInput.length; i++) {
+          if (i >= currentLine.length || userInput[i] !== currentLine[i]) {
+            lineErrors++;
+          }
+        }
+
+        // 누락된 문자도 오류로 계산
+        if (userInput.length < currentLine.length) {
+          lineErrors += currentLine.length - userInput.length;
+        }
+
+        // 총 오류 및 문자 수 업데이트
+        setTotalErrors(prev => prev + lineErrors);
+        setTotalChars(prev => prev + currentLine.length);
+
+        // 마지막 줄인지 확인
+        const isLastLine = currentLineIndex === song.lyrics.length - 1;
+
+        if (isLastLine) {
+          // 마지막 줄이면 결과 모달 출력
+          const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
+          // TODO Show modal
+        } else {
+          // 다음 줄로 이동
+          setCurrentLineIndex(prev => prev + 1);
+          setUserInput('');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [userInput, song.lyrics.length]);
+  }, [userInput, song.lyrics, currentLineIndex, totalErrors, totalChars, elapsedTime, wpm]);
 
   // 입력 변경 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
+    const prevInput = userInput;
     setUserInput(input);
 
     // 입력이 현재 줄과 일치하는지 확인
@@ -70,8 +109,12 @@ export default function LyricsPracticePage() {
     const isInputCorrect = currentLine.startsWith(input);
     setIsCorrect(isInputCorrect);
 
-    // 타이핑된 문자 수 업데이트
-    setTypedChars((prev) => prev + 1);
+    // 실제 타이핑된 문자 수 업데이트 (입력이 증가한 경우에만)
+    if (input.length > prevInput.length) {
+      // 실제로 추가된 문자 수만큼만 증가
+      const charsAdded = input.length - prevInput.length;
+      setTypedChars((prev) => prev + charsAdded);
+    }
 
     // WPM 계산 (1분당 평균 단어 수, 단어는 평균 5자로 가정)
     if (elapsedTime > 0) {
@@ -107,11 +150,18 @@ export default function LyricsPracticePage() {
     return visibleLines;
   };
 
-  // 시간 형식 변환 함수 (초 -> MM:SS)
+  // 시간 형식 변환 (초 -> MM:SS)
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // 정확도 계산
+  const calculateAccuracy = (): string => {
+    if (totalChars === 0) return '100.0';
+    const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
+    return accuracy.toFixed(1);
   };
 
   return (
@@ -130,10 +180,14 @@ export default function LyricsPracticePage() {
               <span className="text-sm text-gray-500">WPM:</span>
               <span className="ml-2 font-medium">{wpm}</span>
             </div>
+            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg">
+              <span className="text-sm text-gray-500">정확도:</span>
+              <span className="ml-2 font-medium">{calculateAccuracy()}%</span>
+            </div>
           </div>
         </div>
 
-        {/* 슬라이딩 가사 디스플레이 (아이폰 시간 선택기와 유사) */}
+        {/* 슬라이딩 가사 디스플레이 */}
         <div className="relative w-full h-60 overflow-hidden mb-8 border rounded-lg flex items-center justify-center">
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {getVisibleLines().map((line, index) => {
@@ -176,7 +230,7 @@ export default function LyricsPracticePage() {
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
               isCorrect ? 'focus:ring-green-500 border-green-300' : 'focus:ring-red-500 border-red-300'
             }`}
-            placeholder="여기에 타이핑하세요..."
+            placeholder="여기에 타이핑하세요."
           />
 
           <p className="mt-2 text-sm text-gray-500">
