@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-sm">
-              타자 노래 최고기록: <span className="font-bold">98 WPM</span>
+              타자 노래 최고기록: <span className="font-bold">341 CPM</span>
             </p>
             <p className="text-sm">
               게임 최고기록: <span className="font-bold">2,450점</span>

@@ -13,7 +13,7 @@ import { useMutation } from '@tanstack/react-query';
   const artist = searchParams.get('artist')!;
   const title = searchParams.get('title')!;
   const time = searchParams.get('time') || '0';
-  const wpm = searchParams.get('wpm') || '0';
+  const cpm = searchParams.get('cpm') || '0';
   const accuracy = searchParams.get('accuracy') || '0';
 
   const [playerName, setPlayerName] = useState('');
@@ -25,7 +25,7 @@ import { useMutation } from '@tanstack/react-query';
     artist: string;
     title: string;
     time: string;
-    wpm: string;
+    cpm: string;
     accuracy: string
   }) => {
     // This would typically be an API call to save the results
@@ -72,7 +72,7 @@ import { useMutation } from '@tanstack/react-query';
       artist,
       title,
       time,
-      wpm,
+      cpm,
       accuracy
     });
   };
@@ -101,8 +101,8 @@ import { useMutation } from '@tanstack/react-query';
             <p className="text-xl font-bold">{formatTime(time)}</p>
           </div>
           <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">WPM</p>
-            <p className="text-xl font-bold">{wpm}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">CPM</p>
+            <p className="text-xl font-bold">{cpm}</p>
           </div>
           <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">정확도</p>

@@ -22,7 +22,7 @@ export default function LyricsPracticePage() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [typedChars, setTypedChars] = useState(0);
-  const [wpm, setWpm] = useState(0);
+  const [cpm, setCpm] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [totalErrors, setTotalErrors] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
@@ -52,7 +52,7 @@ export default function LyricsPracticePage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 입력이 비어있으면 처리하지 않음 (WPM 버그 수정)
+    // 입력이 비어있으면 처리하지 않음 (CPM 버그 수정)
     if (!song.lyrics[currentLineIndex] || !song.lyrics[currentLineIndex].length) {
       return;
     }
@@ -104,7 +104,7 @@ export default function LyricsPracticePage() {
     // 결과 페이지로 이동
     const url = new URL('/result', window.location.href);
     url.searchParams.set('time', elapsedTime.toString());
-    url.searchParams.set('wpm', wpm.toString());
+    url.searchParams.set('cpm', cpm.toString());
     url.searchParams.set('accuracy', accuracy);
     url.searchParams.set('artist', song.artist);
     url.searchParams.set('title', song.title);
@@ -126,18 +126,29 @@ export default function LyricsPracticePage() {
 
     // 실제 타이핑된 문자 수 업데이트 (입력이 증가한 경우에만)
     if (input.length > prevInput.length) {
-      // 실제로 추가된 문자 수만큼만 증가
-      const charsAdded = input.length - prevInput.length;
-      setTypedChars((prev) => prev + charsAdded);
+      // 새로 추가된 문자들만 확인
+      const newChars = input.slice(prevInput.length);
+      let correctCharsAdded = 0;
+
+      // 각 새 문자가 올바른지 확인
+      for (let i = 0; i < newChars.length; i++) {
+        const charPosition = prevInput.length + i;
+        // 현재 줄의 해당 위치에 문자가 있고, 입력한 문자와 일치하는지 확인
+        if (charPosition < currentLine.length && newChars[i] === currentLine[charPosition]) {
+          correctCharsAdded++;
+        }
+      }
+
+      // 올바르게 입력된 문자 수만 증가
+      setTypedChars((prev) => prev + correctCharsAdded);
     }
 
-    // WPM 계산 (1분당 평균 단어 수, 단어는 평균 5자로 가정)
+    // CPM 계산 (1분당 올바르게 입력한 문자 수)
     if (elapsedTime > 0) {
-      // 분당 타자 수 = (총 타자 수 / 경과 시간(초)) * 60
+      // 분당 타자 수 = (올바른 타자 수 / 경과 시간(초)) * 60
       const charsPerMinute = (typedChars / elapsedTime) * 60;
-      // WPM = 분당 타자 수 / 5 (평균 단어 길이)
-      const calculatedWpm = Math.round(charsPerMinute / 5);
-      setWpm(calculatedWpm);
+      const calculatedCpm = Math.round(charsPerMinute);
+      setCpm(calculatedCpm);
     }
   };
 
@@ -195,8 +206,8 @@ export default function LyricsPracticePage() {
               <span className="ml-2 font-medium">{formatTime(elapsedTime)}</span>
             </div>
             <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg">
-              <span className="text-sm text-gray-500">WPM:</span>
-              <span className="ml-2 font-medium">{wpm}</span>
+              <span className="text-sm text-gray-500">CPM:</span>
+              <span className="ml-2 font-medium">{cpm}</span>
             </div>
             <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg">
               <span className="text-sm text-gray-500">정확도:</span>
