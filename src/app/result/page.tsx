@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 
-export default function ResultPage() {
+  // ResultContent 컴포넌트는 useSearchParams를 사용하는 실제 내용을 담당
+  function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -19,13 +20,13 @@ export default function ResultPage() {
   const [error, setError] = useState('');
 
   // Placeholder mutation function
-  const submitResults = async (data: { 
-    playerName: string; 
+  const submitResults = async (data: {
+    playerName: string;
     artist: string;
     title: string;
-    time: string; 
-    wpm: string; 
-    accuracy: string 
+    time: string;
+    wpm: string;
+    accuracy: string
   }) => {
     // This would typically be an API call to save the results
     console.log('Submitting results:', data);
@@ -138,5 +139,14 @@ export default function ResultPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+// 메인 페이지 컴포넌트에서 Suspense 경계 설정
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-[calc(100vh-200px)]">결과를 불러오는 중...</div>}>
+      <ResultContent />
+    </Suspense>
   );
 }
