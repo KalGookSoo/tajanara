@@ -173,10 +173,11 @@ export default function LyricsPracticePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-[calc(100vh-200px)]">
-      <div className="w-full max-w-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-center">
+    <div className="flex flex-col space-y-4 max-w-2xl mx-auto w-full">
+      {/* 제목 섹션 */}
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-2xl font-bold">
             {song.title} - {song.artist}
           </h2>
           <div className="flex items-center space-x-4">
@@ -194,9 +195,11 @@ export default function LyricsPracticePage() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* 슬라이딩 가사 디스플레이 */}
-        <div className="relative w-full h-60 overflow-hidden mb-8 border rounded-lg flex items-center justify-center">
+      {/* 가사 디스플레이 섹션 */}
+      <div className="w-full">
+        <div className="relative w-full h-60 overflow-hidden border rounded-lg flex items-center justify-center">
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {getVisibleLines().map((line, index) => {
               const isCurrent = line.index === currentLineIndex;
@@ -204,13 +207,14 @@ export default function LyricsPracticePage() {
 
               return (
                 <div
-                  key={index}
-                  className={`w-full h-12 flex items-center justify-center transition-all duration-300 text-center ${
+                  key={line.index}
+                  className={`w-full h-12 flex items-center justify-center text-center ${
                     isCurrent ? 'font-bold text-lg bg-gray-100 dark:bg-gray-800' : 'text-gray-500 text-base'
                   }`}
                   style={{
                     transform: `translateY(${position * 48}px)`,
-                    opacity: isCurrent ? 1 : Math.max(0.5, 1 - Math.abs(position) * 0.2)
+                    opacity: isCurrent ? 1 : Math.max(0.5, 1 - Math.abs(position) * 0.2),
+                    transition: 'all 0.5s ease-in-out'
                   }}
                 >
                   {line.text}
@@ -224,12 +228,9 @@ export default function LyricsPracticePage() {
         </div>
       </div>
 
-      {/* 타이핑 입력 영역 */}
-      <div className="w-full max-w-2xl mt-auto">
+      {/* 사용자 입력 섹션 */}
+      <div className="w-full">
         <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg">
-          <p className="mb-2 text-sm text-gray-500">현재 줄:</p>
-          <p className="mb-4 font-medium">{song.lyrics[currentLineIndex]}</p>
-
           <form onSubmit={handleSubmit}>
             <input
               ref={inputRef}
@@ -242,7 +243,9 @@ export default function LyricsPracticePage() {
               placeholder="여기에 타이핑하세요."
               required
             />
-            <button type="submit" className="sr-only">제출</button>
+            <button type="submit" className="sr-only">
+              제출
+            </button>
           </form>
 
           <p className="mt-2 text-sm text-gray-500">

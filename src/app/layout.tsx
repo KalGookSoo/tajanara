@@ -34,23 +34,29 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <AudioProvider>
           <KeyboardSoundEffect />
-          <Header />
+          <div className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
+            <Header />
+          </div>
 
-          <main className="flex-grow container mx-auto px-4 py-8">
-            <div className="mb-4 flex justify-between items-center">
-              <div>
-                <BackButton />
+          <div className="flex-grow overflow-auto pt-16 pb-16">
+            <main className="container mx-auto px-4 py-8">
+              <div className="mb-4 flex justify-between items-center">
+                <div>
+                  <BackButton />
+                </div>
+                <div>
+                  <MuteButton />
+                </div>
               </div>
-              <div>
-                <MuteButton />
-              </div>
-            </div>
-            <Providers>
-              {children}
-            </Providers>
-          </main>
+              <Providers>
+                {children}
+              </Providers>
+            </main>
+          </div>
 
-          <Footer />
+          <div className="fixed bottom-0 left-0 right-0 z-10 bg-white dark:bg-black">
+            <Footer />
+          </div>
         </AudioProvider>
       </body>
     </html>

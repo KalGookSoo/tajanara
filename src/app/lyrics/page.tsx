@@ -8,10 +8,10 @@ export default function LyricsPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center text-center">
-      <h2 className="text-2xl font-bold mb-6">노래 가사 선택</h2>
+    <div className="max-w-2xl mx-auto w-full">
+      <h2 className="text-2xl font-bold mb-6 text-left">가사</h2>
 
-      <div className="flex flex-col gap-6 w-full max-w-xl">
+      <div className="flex flex-col gap-6 w-full">
         {songItems.map((item, index) => (
           <Link
             key={index}
