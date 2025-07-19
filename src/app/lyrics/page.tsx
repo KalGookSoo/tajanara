@@ -43,7 +43,7 @@ export default function LyricsPage() {
 
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <h1 className="text-2xl font-bold mb-6">노래 가사 선택</h1>
+      <h2 className="text-2xl font-bold mb-6">노래 가사 선택</h2>
 
       <div className="flex flex-col gap-6 w-full max-w-xl">
         {songItems.map((item, index) => (

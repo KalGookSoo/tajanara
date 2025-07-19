@@ -7,6 +7,7 @@ import KeyboardSoundEffect from '@/app/components/KeyboardSoundEffect';
 import { AudioProvider } from '@/app/context/AudioContext';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
+import Providers from './providers';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -44,7 +45,9 @@ export default function RootLayout({
                 <MuteButton />
               </div>
             </div>
-            {children}
+            <Providers>
+              {children}
+            </Providers>
           </main>
 
           <Footer />

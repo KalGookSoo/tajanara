@@ -16,7 +16,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // 컴포넌트가 마운트될 때 오디오 요소 생성
-    audioRef.current = new Audio('/keyboard_tactile_10.ogg');
+    // audioRef.current = new Audio('/keyboard_01.ogg');
+    // audioRef.current = new Audio('/keyboard_02.wav');
+    // audioRef.current = new Audio('/keyboard_03.wav');
+    audioRef.current = new Audio('/keyboard_04.wav');
 
     // 컴포넌트가 언마운트될 때 정리
     return () => {

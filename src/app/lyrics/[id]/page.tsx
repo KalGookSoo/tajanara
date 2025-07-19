@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { songItems } from '../../shared/songs';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function LyricsPracticePage() {
   const params = useParams();
+  const router = useRouter();
 
   // 현재 음악 탐색
   const songId = parseInt(params.id as string, 10);
@@ -46,6 +47,7 @@ export default function LyricsPracticePage() {
     };
   }, []);
 
+
   // 키보드 이벤트 처리 (Enter로 다음 줄로 이동)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -81,9 +83,20 @@ export default function LyricsPracticePage() {
         const isLastLine = currentLineIndex === song.lyrics.length - 1;
 
         if (isLastLine) {
-          // 마지막 줄이면 결과 모달 출력
+          // 마지막 줄이면 결과 페이지로 이동
           const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
-          // TODO Show modal
+          // 타이머 정지
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          // 결과 페이지로 이동
+          const url = new URL('/result', window.location.href);
+          url.searchParams.set('time', elapsedTime.toString());
+          url.searchParams.set('wpm', wpm.toString());
+          url.searchParams.set('accuracy', accuracy.toFixed(1));
+          url.searchParams.set('artist', song.artist);
+          url.searchParams.set('title', song.title);
+          router.push(url.href);
         } else {
           // 다음 줄로 이동
           setCurrentLineIndex(prev => prev + 1);
@@ -94,7 +107,7 @@ export default function LyricsPracticePage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [userInput, song.lyrics, currentLineIndex, totalErrors, totalChars, elapsedTime, wpm]);
+  }, [userInput, song.lyrics, currentLineIndex, totalErrors, totalChars, elapsedTime, wpm, router, song]);
 
   // 입력 변경 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,6 +176,7 @@ export default function LyricsPracticePage() {
     const accuracy = Math.max(0, Math.min(100, Math.round((1 - totalErrors / totalChars) * 1000) / 10));
     return accuracy.toFixed(1);
   };
+
 
   return (
     <div className="flex flex-col items-center justify-between min-h-[calc(100vh-200px)]">
