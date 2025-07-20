@@ -18,7 +18,7 @@ export default function KeyboardSoundEffect() {
         e.key !== 'Alt' &&
         e.key !== 'Meta'
       ) {
-        playKeyboardSound();
+        // playKeyboardSound();
       }
     };
 
