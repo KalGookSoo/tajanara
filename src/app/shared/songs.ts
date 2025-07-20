@@ -1,4 +1,3 @@
-// Song interface definition
 export interface Song {
   id: number;
   title: string;
@@ -6,7 +5,6 @@ export interface Song {
   lyrics: string[];
 }
 
-// Song list sample
 export const songItems: Song[] = [
   {
     id: 1,

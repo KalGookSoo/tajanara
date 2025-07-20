@@ -1,14 +1,15 @@
 'use client';
 
 import { SpeakerWaveIcon, SpeakerXMarkIcon } from '@heroicons/react/24/outline';
-import { useAudio } from '@/app/context/AudioContext';
+import { useSettingsStore } from '@/app/store/settingsStore';
 
 export default function MuteButton() {
-  const { isMuted, toggleMute } = useAudio();
+  const { state, toggleSound } = useSettingsStore();
+  const isMuted = !state.soundEnabled;
 
   return (
     <button
-      onClick={toggleMute}
+      onClick={toggleSound}
       className="inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       aria-label={isMuted ? '음소거 해제' : '음소거'}
     >

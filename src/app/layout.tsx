@@ -2,9 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import BackButton from './components/BackButton';
-import MuteButton from '@/app/components/MuteButton';
 import KeyboardSoundEffect from '@/app/components/KeyboardSoundEffect';
-import { AudioProvider } from '@/app/context/AudioContext';
+import SettingsApplier from '@/app/components/SettingsApplier';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import Providers from './providers';
@@ -32,32 +31,26 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <AudioProvider>
-          <KeyboardSoundEffect />
-          <div className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
-            <Header />
-          </div>
+        <SettingsApplier />
+        <KeyboardSoundEffect />
+        <div className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
+          <Header />
+        </div>
 
-          <div className="flex-grow overflow-auto pt-16 pb-16">
-            <main className="container mx-auto px-4 py-8">
-              <div className="mb-4 flex justify-between items-center">
-                <div>
-                  <BackButton />
-                </div>
-                <div>
-                  <MuteButton />
-                </div>
-              </div>
-              <Providers>
-                {children}
-              </Providers>
-            </main>
-          </div>
+        <div className="flex-grow overflow-auto pt-16 pb-16">
+          <main className="container mx-auto px-4 py-8">
+            <div className="mb-4">
+              <BackButton />
+            </div>
+            <Providers>
+              {children}
+            </Providers>
+          </main>
+        </div>
 
-          <div className="fixed bottom-0 left-0 right-0 z-10 bg-white dark:bg-black">
-            <Footer />
-          </div>
-        </AudioProvider>
+        <div className="fixed bottom-0 left-0 right-0 z-10 bg-white dark:bg-black">
+          <Footer />
+        </div>
       </body>
     </html>
   );

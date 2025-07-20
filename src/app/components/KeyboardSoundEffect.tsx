@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAudio } from '@/app/context/AudioContext';
+import { useSettingsStore } from '@/app/store/settingsStore';
 
 export default function KeyboardSoundEffect() {
-  const { playKeyboardSound } = useAudio();
+  const { playKeyboardSound } = useSettingsStore();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
