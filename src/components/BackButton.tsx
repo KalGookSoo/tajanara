@@ -12,7 +12,7 @@ export default function BackButton() {
 
   return (
     <Link
-      href="/"
+      href="/public"
       className="inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       aria-label="뒤로 가기"
     >

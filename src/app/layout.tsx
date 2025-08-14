@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import BackButton from './components/BackButton';
-import KeyboardSoundEffect from '@/app/components/KeyboardSoundEffect';
-import SettingsApplier from '@/app/components/SettingsApplier';
-import Header from '@/app/components/Header';
-import Footer from '@/app/components/Footer';
+import BackButton from '@/components/BackButton';
+import KeyboardSoundEffect from '@/components/KeyboardSoundEffect';
+import SettingsApplier from '@/components/SettingsApplier';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import Providers from './providers';
 
 const geistSans = Geist({
