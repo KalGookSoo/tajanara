@@ -5,6 +5,8 @@ import { Song } from '@/app/shared/songs';
 import { useRouter } from 'next/navigation';
 
 export default function Content({ song }: { song: Song }) {
+  const lyrics = song.lyrics.split('\n');
+
   // 현재 입력 상태
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
@@ -48,17 +50,17 @@ export default function Content({ song }: { song: Song }) {
     e.preventDefault();
 
     // 입력이 비어있으면 처리하지 않음 (CPM 버그 수정)
-    if (!song.lyrics[currentLineIndex] || !song.lyrics[currentLineIndex].length) {
+    if (!lyrics[currentLineIndex] || !lyrics[currentLineIndex].length) {
       return;
     }
 
     // 현재 라인이 유효한지 확인
-    if (currentLineIndex >= song.lyrics.length) {
+    if (currentLineIndex >= lyrics.length) {
       return;
     }
 
     // 현재 줄과 입력 비교하여 오류 계산
-    const currentLine = song.lyrics[currentLineIndex];
+    const currentLine = lyrics[currentLineIndex];
 
     // 입력된 각 문자에 대해 오류 확인
     const inputErrors = userInput
@@ -83,7 +85,7 @@ export default function Content({ song }: { song: Song }) {
     }
 
     // 마지막 줄인지 확인
-    const isLastLine = currentLineIndex === song.lyrics.length - 1;
+    const isLastLine = currentLineIndex === lyrics.length - 1;
     if (!isLastLine) {
       // 다음 줄로 이동
       setCurrentLineIndex((prev) => prev + 1);
@@ -113,7 +115,7 @@ export default function Content({ song }: { song: Song }) {
     setUserInput(input);
 
     // 입력이 현재 줄과 일치하는지 확인
-    const currentLine = song.lyrics[currentLineIndex];
+    const currentLine = lyrics[currentLineIndex];
 
     // 입력한 부분이 현재 줄의 시작 부분과 일치하는지 확인
     const isInputCorrect = currentLine.startsWith(input);
@@ -163,9 +165,9 @@ export default function Content({ song }: { song: Song }) {
     const halfNumLines = Math.floor(numLinesToShow / 2);
 
     for (let i = currentLineIndex - halfNumLines; i <= currentLineIndex + halfNumLines; i++) {
-      if (i >= 0 && i < song.lyrics.length) {
+      if (i >= 0 && i < lyrics.length) {
         visibleLines.push({
-          text: song.lyrics[i],
+          text: lyrics[i],
           index: i
         });
       } else {

@@ -14,7 +14,7 @@ export default async function LyricsPracticePage({ params }: Props): Promise<JSX
   const songId = parseInt(params.id as string, 10);
   const data = await fetch(getApiUrl(`/songs/${songId}`));
   const json = await data.json();
-  const song: Song = json._embedded.song as Song;
+  const song: Song = json.song as Song;
 
   return <Content song={song} />;
 }

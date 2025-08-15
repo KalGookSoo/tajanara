@@ -5,7 +5,7 @@ import { getApiUrl } from '@/app/shared/config';
 export default async function LyricsPage() {
   const data = await fetch(getApiUrl('/songs'));
   const json = await data.json();
-  const songs: Song[] = json._embedded.songs as Song[];
+  const songs: Song[] = json.content as Song[];
 
   return (
     <div className="max-w-2xl mx-auto w-full">
