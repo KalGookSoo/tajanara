@@ -4,14 +4,15 @@ import { JSX } from 'react';
 import Content from '@/app/lyrics/[id]/_content';
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default async function LyricsPracticePage({ params }: Props): Promise<JSX.Element> {
   // 현재 음악 탐색
-  const songId = parseInt(params.id as string, 10);
+  const { id } = await params;
+  const songId = parseInt(id, 10);
   const data = await fetch(getApiUrl(`/songs/${songId}`));
   const json = await data.json();
   const song: Song = json.song as Song;
