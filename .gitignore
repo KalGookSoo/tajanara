@@ -2,6 +2,7 @@
 
 /.idea
 /.junie
+/.aiassistant
 
 # dependencies
 /node_modules
