@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import BackButton from '@/components/BackButton';
-import KeyboardSoundEffect from '@/components/KeyboardSoundEffect';
 import SettingsApplier from '@/components/SettingsApplier';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Providers from './providers';
+import React, { JSX } from 'react';
+import ReduxProvider from '@/app/redux-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,34 +23,33 @@ export const metadata: Metadata = {
   description: '노래 가사, 게임 등을 통한 타자 연습 웹 애플리케이션'
 };
 
-export default function RootLayout({
-  children
-}: Readonly<{
+type RootLayoutProps = {
   children: React.ReactNode;
-}>) {
+};
+
+export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <SettingsApplier />
-        <KeyboardSoundEffect />
-        <div className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
-          <Header />
-        </div>
+        <ReduxProvider>
+          <SettingsApplier />
+          <div className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-black">
+            <Header />
+          </div>
 
-        <div className="flex-grow overflow-auto pt-16 pb-16">
-          <main className="container mx-auto px-4 py-8">
-            <div className="mb-4">
-              <BackButton />
-            </div>
-            <Providers>
+          <div className="flex-grow overflow-auto pt-16 pb-16">
+            <main className="container mx-auto px-4 py-8">
+              <div className="mb-4">
+                <BackButton />
+              </div>
               {children}
-            </Providers>
-          </main>
-        </div>
+            </main>
+          </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-white dark:bg-black">
-          <Footer />
-        </div>
+          <div className="fixed bottom-0 left-0 right-0 z-10 bg-white dark:bg-black">
+            <Footer />
+          </div>
+        </ReduxProvider>
       </body>
     </html>
   );

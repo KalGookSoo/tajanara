@@ -1,5 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/shared/lib/state';
+import { decodeBase64Json } from '@/shared/lib/encoding';
 
 export type AuthState = {
   accessToken: string | null;
@@ -16,15 +17,22 @@ export type TokenPayload = {
   [key: string]: unknown;
 } | null;
 
-const initialState: AuthState = {
-  accessToken: localStorage.getItem('accessToken'),
-  refreshToken: localStorage.getItem('refreshToken'),
-  expiresIn: (() => {
-    const item: string | null = localStorage.getItem('expiresIn');
-    const isParsable = !!item && !Number.isNaN(item);
-    return isParsable ? parseInt(item, 10) : null;
-  })()
+const getInitialState = (): AuthState => {
+  const base: AuthState = { accessToken: null, refreshToken: null, expiresIn: null };
+  if (typeof window === 'undefined') return base; // SSR/Edge: don't touch localStorage
+  try {
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const rawExpires = localStorage.getItem('expiresIn');
+    const n = rawExpires != null ? Number(rawExpires) : NaN;
+    const expiresIn = Number.isFinite(n) ? n : null;
+    return { accessToken, refreshToken, expiresIn };
+  } catch {
+    return base;
+  }
 };
+
+const initialState: AuthState = getInitialState();
 
 const authSlice = createSlice({
   name: 'auth',
@@ -35,17 +43,25 @@ const authSlice = createSlice({
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
       state.expiresIn = expiresIn;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('expiresIn', String(expiresIn));
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem('expiresIn', String(expiresIn));
+        } catch {}
+      }
     },
     signOut(state: AuthState) {
       state.accessToken = null;
       state.refreshToken = null;
       state.expiresIn = null;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('expiresIn');
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('expiresIn');
+        } catch {}
+      }
     }
   }
 });
@@ -57,8 +73,8 @@ const decodeJwtPayload = (token: string): TokenPayload => {
     const parts = token.split('.');
     if (parts.length < 2) return null;
     const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const json = atob(base64);
-    return JSON.parse(json);
+    const payload = decodeBase64Json<Record<string, unknown>>(base64);
+    return (payload ?? null) as TokenPayload;
   } catch {
     return null;
   }
@@ -83,8 +99,6 @@ export const selectIsAuthenticated = (state: RootState): boolean => {
   }
   // 선택 사항: iat가 현재 시간보다 미래라면 아직 유효하지 않은 토큰으로 간주
   return !(typeof payload.iat === 'number' && payload.iat > nowSec);
-
 };
-
 
 export default authSlice.reducer;
