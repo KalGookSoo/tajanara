@@ -1,4 +1,3 @@
-import { Song } from '../../shared/songs';
 import { getApiUrl } from '@/app/shared/config';
 import { JSX } from 'react';
 import Content from '@/app/lyrics/[id]/_content';
@@ -9,13 +8,14 @@ type Props = {
   }>;
 };
 
-export default async function LyricsPracticePage({ params }: Props): Promise<JSX.Element> {
-  // 현재 음악 탐색
-  const { id } = await params;
-  const songId = parseInt(id, 10);
-  const data = await fetch(getApiUrl(`/songs/${songId}`));
+const getSong = async (id: string) => {
+  const data = await fetch(getApiUrl(`/songs/${id}`));
   const json = await data.json();
-  const song: Song = json.song as Song;
+  return json.song as Song;
+};
 
+export default async function LyricsPracticePage({ params }: Props): Promise<JSX.Element> {
+  const { id } = await params;
+  const song: Song = await getSong(id);
   return <Content song={song} />;
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { JSX } from 'react';
@@ -13,20 +11,18 @@ const navItems = [
 
 export default function Home(): JSX.Element {
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] w-full items-center justify-center">
-      <nav aria-label="주요 메뉴" className="w-full max-w-sm">
-        <ul className="flex flex-col gap-4">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <Button variant="outline" asChild size="lg" className="w-full">
-                <Link href={item.href} aria-label={item.name}>
-                  {item.name}
-                </Link>
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+    <nav aria-label="메뉴" className="w-full max-w-sm">
+      <ul className="flex flex-col gap-4">
+        {navItems.map((item) => (
+          <li key={item.href}>
+            <Button variant="outline" asChild size="lg" className="w-full">
+              <Link href={item.href} aria-label={item.name}>
+                {item.name}
+              </Link>
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

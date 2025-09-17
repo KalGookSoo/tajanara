@@ -1,27 +1,30 @@
-import { Song } from '../shared/songs';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { getApiUrl } from '@/app/shared/config';
 
-export default async function LyricsPage() {
+const getSongs = async () => {
   const data = await fetch(getApiUrl('/songs'));
   const json = await data.json();
-  const songs: Song[] = json.content as Song[];
+  return json.content as Song[];
+};
 
+export default async function LyricsPage() {
+  const songs: Song[] = await getSongs();
   return (
-    <div className="max-w-2xl mx-auto w-full">
-      <h2 className="text-2xl font-bold mb-6 text-left">가사</h2>
-
-      <div className="flex flex-col gap-6 w-full">
-        {songs.map((item, index) => (
-          <Link
-            key={index}
-            className="bg-gray-800 hover:bg-gray-900 text-white text-xl font-bold p-8 rounded-lg shadow-md transition-all transform hover:scale-105 focus:ring-4 focus:ring-gray-500 focus:outline-none cursor-pointer"
-            href={`/lyrics/${item.id}`}
-          >
-            {item.title} - {item.artist}
-          </Link>
-        ))}
-      </div>
-    </div>
+    <>
+      <nav aria-label="노래 목록" className="w-full max-w-sm">
+        <ul className="flex flex-col gap-4">
+          {songs.map((item, index) => (
+            <li key={index}>
+              <Button variant="outline" asChild size="lg" className="w-full">
+                <Link href={`/lyrics/${item.id}`} aria-label={item.title}>
+                  {item.title} - {item.artist}
+                </Link>
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 }

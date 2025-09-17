@@ -8,7 +8,9 @@ export default function BackButton() {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
-  if (isHomePage) return null;
+  if (isHomePage) {
+    return null;
+  }
 
   // 현재 경로 기준으로 상위 경로 계산
   const pathSegments = pathname.split('/').filter(Boolean);

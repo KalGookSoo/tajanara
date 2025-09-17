@@ -24,6 +24,16 @@ declare global {
     refreshToken: string;
     expiresIn: number;
   }
+
+  /**
+   * 노래
+   */
+  interface Song {
+    id: string;
+    title: string;
+    artist: string;
+    lyrics: string;
+  }
 }
 
 export {};

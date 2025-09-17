@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import React, { JSX } from 'react';
 import ReduxProvider from '@/app/redux-provider';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,10 +40,11 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
 
           <div className="flex-grow overflow-auto pt-16 pb-16">
             <main className="container mx-auto px-4 py-8">
-              <div className="mb-4">
+              <div className="mb-4 flex items-center justify-between gap-2">
                 <BackButton />
+                <Breadcrumbs />
               </div>
-              {children}
+              <div className="flex min-h-[calc(100vh-8rem)] w-full items-center justify-center">{children}</div>
             </main>
           </div>
 
